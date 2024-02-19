@@ -14,7 +14,7 @@ def parse_csv():
         line = line.rstrip()
         athlete = line.split(',')
         athletes.append(athlete)
-        total += 1   
+        total += 1
     return (athletes, total)
 
 def percentage_apt_athletes(athletes, total):
