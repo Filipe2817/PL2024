@@ -1,6 +1,4 @@
-# TPC1 - Análise de Datasets de Exames Médicos Desportivos
-
----
+# TP1 - Análise de Datasets de Exames Médicos Desportivos
 
 ## Autor: [Filipe Simões Pereira](https://github.com/Filipe2817), A100552
 
@@ -119,7 +117,7 @@ O programa apresenta os resultados de forma tabular, para tornar o *output* visu
 
 A execução do programa com o dataset [emd.csv](emd.csv) gera o seguinte *output*:
 
-![Output tpc1](../images/tpc1-output.png)
+![Output tp1](/images/tp1-output.png)
 
 > Nota: Qualquer dataset que cumpra os [requisitos](#requisitos-para-utilização), deverá gerar um *output* semelhante ao apresentado acima.
 
