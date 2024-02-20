@@ -31,6 +31,8 @@ Para utilizar o programa, é necessário ter **Python 3.x** instalado e um fiche
 _id,index,dataEMD,nome/primeiro,nome/último,idade,género,morada,modalidade,clube,email,federado,resultado
 ```
 
+> Nota: O cabeçalho apresentado acima é estritamente necessário e deve ser a primeira linha do ficheiro CSV para que o programa execute corretamente.
+
 Exemplo:
 
 ```csv
