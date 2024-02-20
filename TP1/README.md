@@ -46,7 +46,7 @@ O conjunto de dados deve ser fornecido ao programa através do ***standard input
 Como o objetivo principal do trabalho é gerar as estatísticas sobre os atletas, não foi criada uma classe para representar os atletas indivualmente. Neste caso, as
 propriedades e vantagens que as classes trazem ao programador não seriam devidamente aproveitadas, porque apenas serviriam para armazenamento temporário dos dados. Portanto, optou-se por uma abordagem mais simplista e direta, em que os atletas são guardados numa lista e cada atleta é representado por uma lista de strings que correpondem diretamente aos campos do dataset.
 
-Na função `parse_csv` é feita a leitura do dataset, linha a linha, começando por excluir a linha do cabeçalho. Cada linha tem os espaços em branco finais removidos e é então dividida em campos, que são guardados numa lista. Depois de processada a linha, a lista de campos é adicionada à lista de atletas. Para além disso, é mantido um contador que guarda o número de atletas lidos. No final, a função retorna a lista de atletas com os respetivos campos e o número total de atletas processados.
+Na função `parse_csv` é feita a leitura do dataset, linha a linha, começando por excluir a linha do cabeçalho. Cada linha tem os espaços em branco finais removidos e é então dividida em campos, que são guardados numa lista. Após a obtenção a lista de campos, a mesma é adicionada à lista de atletas. Para além disso, é mantido um contador que guarda o número de atletas lidos. No final, a função retorna a lista de atletas com os respetivos campos e o número total de atletas processados.
 
 ```python
 def parse_csv():
@@ -71,7 +71,7 @@ modalities = [k for k, _ in itertools.groupby(sorted([athlete[8] for athlete in 
 
 ### Percentagem de Atletas Aptos e Inaptos (3)
 
-Para calcular a percentagem de atletas aptos, a função `percentage_apt_athletes` verifica quantos atletas estão determinados como aptos na lista de atletas. A função retorna a percentagem de atletas aptos em relação ao total de atletas.
+Para calcular a percentagem de atletas aptos, a função `percentage_apt_athletes` verifica quantos atletas estão identificados como aptos na lista e retorna a percentagem de atletas aptos em relação ao total de atletas.
 
 ```python
 def percentage_apt_athletes(athletes, total):
@@ -87,7 +87,7 @@ Depois de obter a percentagem de atletas aptos, a percentagem de atletas inaptos
 
 ### Distribuição de Atletas por Escalão Etário (4)
 
-Para gerar a distribuição de atletas por escalão etário, a função `generate_age_group_distribution` determina os grupos etários existentes com base no intervalo de idades fornecido e cria um dicionário, inserindo os grupos como chaves e associando uma lista com duas estatísticas: o número de atletas e a sua percentagem em relação ao total. De seguida, itera sobre a lista de atletas e faz a contagem de atletas em cada grupo etário. Por fim, calcula a percentagem de atletas em cada grupo e retorna o dicionário com as estatísticas de distribuição.
+Para gerar a distribuição de atletas por escalão etário, a função `generate_age_group_distribution` determina os grupos etários existentes com base no intervalo de idades dos atletas e insere-os como chaves num dicionário. Cada chave é associada a uma lista que contém duas estatísticas: o número de atletas e a sua percentagem em relação ao total. De seguida, itera sobre a lista de atletas para fazer a contagem de atletas em cada grupo etário. Por fim, calcula a percentagem de atletas em cada grupo e retorna o dicionário com as estatísticas de distribuição.
 
 ```python
 def generate_age_group_distribution(athletes, age_range, total):
@@ -124,10 +124,10 @@ A execução do programa com o dataset [emd.csv](emd.csv) gera o seguinte *outpu
 ## Trabalho Futuro
 
 - Adicionar tipos e exceções para melhorar a robustez do código
-- Adicionar constantes com os índices dos campos dos atletas utilizados, para melhorar a legibilidade do código
+- Adicionar constantes com os índices dos campos dos atletas utilizados para melhorar a legibilidade do código
 - Aplicar um algoritmo de arredondamento para diminuir a perda de precisão nos cálculos de percentagens
 - Otimizar o cálculo da distribuição (provavelmente aplicar *incremental averaging* modificada para reduzir cálculos e acessos às estruturas de dados ou repensar a lógica de cálculo no geral)
-- Melhorar a apresentação do *output* com uma biblioteca de formatação e/ou abstrair toda a lógica de criação da tabela
+- Melhorar a apresentação do *output* com uma biblioteca de formatação e abstrair toda a lógica de criação da tabela
 - Adicionar a funcionalidade de guardar os resultados em ficheiros
 
 ---
