@@ -33,7 +33,7 @@ _id,index,dataEMD,nome/primeiro,nome/último,idade,género,morada,modalidade,clu
 
 > Nota: O cabeçalho apresentado acima é estritamente necessário e deve ser a primeira linha do ficheiro CSV para que o programa execute corretamente.
 
-Exemplo:
+Exemplo de uma linha de dados válida:
 
 ```csv
 6045087f9ee16ada34f21ae4,100,2023-01-13,Glenn,Best,50,M,Graball,abc,AVCfamalicão,glenn.best@avcfamalicão.ca,true,true
