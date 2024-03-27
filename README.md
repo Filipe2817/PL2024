@@ -4,7 +4,7 @@
 
 ## Sobre o Repositório
 
-Este repositório contém os trabalhos práticos realizados no âmbito da unidade curricular de Processamento de Linguagens, do curso de Engenharia Informática da Universidade do Minho. \
+Este repositório contém os trabalhos práticos realizados no âmbito da unidade curricular de Processamento de Linguagens, da licenciatura em Engenharia Informática da Universidade do Minho. \
 Cada trabalho prático tem uma pasta própria e contém um `README.md` com todos os detalhes e instruções necessárias para a execução do programa.
 
 ## Trabalhos Práticos
@@ -21,5 +21,3 @@ Cada trabalho prático tem uma pasta própria e contém um `README.md` com todos
 ## Licença
 
 Distribuído sob a licença MIT. Ver **[LICENSE.txt](/LICENSE)** para mais informações.
-
----

@@ -1,0 +1,191 @@
+<h1>Markdown Test File</h1>
+<h2>Header2</h2>
+<h3>Header3</h3>
+<h4>Header4</h4>
+<h5>Header5</h5>
+<h6>Header6</h6>
+<h2>Text Formatting</h2>
+<p>This is a <strong>bold</strong> text with more <strong>bold</strong> text.</p>
+<p>This is an <em>italic</em> text with more <em>italic</em> text.</p>
+<p>This is a <em><strong>bold and italic</strong></em> text with more <em><strong>bold and italic</strong></em> text.</p>
+<p>This is a <del>strikethrough</del> text.</p>
+<p><u>This is an underline text that shoudn&#39;t be touched at all</u></p>
+<p>Some text with <code>inline code</code> and without paragraphs
+directly in the same line. <br>This is a new line but not a new paragraph <br>This is another new line but not a new paragraph
+and this should appear in the same line as the previous one.</p>
+<p>This is a new paragraph.</p>
+<p>multiple   spaces    between    words</p>
+<h2>Blockquotes</h2>
+<blockquote>
+<p>This is a blockquote.</p>
+</blockquote>
+<p>Random &gt; paragraph.</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Pretty funny &gt;&gt;&gt; blockquote.</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>Multiple lines <br>of blockquote</p>
+<blockquote>
+<blockquote>
+<p>with nested blockquote
+in the middle</p>
+</blockquote>
+<p>decreasing level
+test</p>
+</blockquote>
+<blockquote>
+<p>another test</p>
+</blockquote>
+<p>the end</p>
+</blockquote>
+<blockquote>
+<p>Roller</p>
+<blockquote>
+<blockquote>
+<p>Coaster</p>
+</blockquote>
+</blockquote>
+<p>Yay</p>
+</blockquote>
+<blockquote>
+<p>a</p>
+</blockquote>
+<blockquote>
+</blockquote>
+<blockquote>
+<p>testing this
+blockquote <br>hehehehe</p>
+</blockquote>
+<h2>Lists</h2>
+<h3>Ordered List</h3>
+<ol>
+<li>First item</li>
+<li>Second item</li>
+<li>Third item<ol>
+<li>Subitem 1</li>
+<li>Subitem 2</li>
+</ol>
+</li>
+</ol>
+<h3>Unordered List</h3>
+<ul>
+<li>Item 1</li>
+<li>Item 2<ul>
+<li>Subitem 1</li>
+<li>Subitem 2</li>
+</ul>
+</li>
+</ul>
+<h2>Code</h2>
+<p>Inline code: <code>print(&quot;Hello, world!&quot;)</code> <br>Weird inline code format: The spaces are<code>inside the backticks</code>XD</p>
+<p>Code block:</p>
+<pre><code>code block without language
+</code></pre>
+<pre><code class="language-python">def greet(name):
+    print(f&quot;Hello, {name}!&quot;)
+
+greet(&quot;Crazy&quot;)
+</code></pre>
+<pre><code class="language-elixir">IO.puts &quot;This is another block of code&quot;
+</code></pre>
+<p>Why not put some example from <code>stackoverflow</code> without a paragraph? <br>This is the <code>Panel</code> constructor:</p>
+<pre><code class="language-javascript">function Panel(element, canClose, closeHandler) {
+  this.element = element;
+  this.canClose = canClose;
+  this.closeHandler = function () { if (closeHandler) closeHandler() };
+}
+</code></pre>
+<h2>Horizontal Rule</h2>
+<hr>
+<hr>
+<p>A --- B</p>
+<h2>Links and Images</h2>
+<p><a href="https://www.google.com">This is a link to Google</a></p>
+<p><img src="https://picsum.photos/200/300" alt="Alt text"></p>
+<p><a href=""></a></p>
+<p><img src="" alt=""></p>
+<h2>Tricky situations</h2>
+<p>##Almost a header</p>
+<h2></h2>
+<p>Random ### not a header</p>
+<p><code>---</code></p>
+<p>--- shoudn&#39;t be a horizontal rule</p>
+<p><code>## header</code></p>
+<p>-not a list</p>
+<ul>
+<li>foo</li>
+<li></li>
+<li>bar</li>
+</ul>
+<ul>
+<li></li>
+</ul>
+<p>foo
+1.</p>
+<ol>
+<li></li>
+<li><ol>
+<li><ol>
+<li></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<ul>
+<li>foo</li>
+<li>bar</li>
+<li>baz</li>
+<li>boo</li>
+</ul>
+<p>1-
+2-
+3.</p>
+<p>1.hvhv</p>
+<ol>
+<li>foo</li>
+</ol>
+<ul>
+<li>1</li>
+</ul>
+<ol>
+<li>hello</li>
+<li>there<ol>
+<li>hahaha</li>
+<li>hehehe</li>
+</ol>
+</li>
+</ol>
+<p>list separator</p>
+<ol>
+<li>hello</li>
+<li>there<ul>
+<li>hahaha</li>
+<li>hehehe</li>
+</ul>
+</li>
+</ol>
+<p><code>foo ` bar </code></p>
+<p><code>foo</code></p>
+<p><code>foo   bar   baz</code></p>
+<p>line break<br>test</p>
+<p><strong>Bold</strong> text next to each other without space<strong>bold again</strong></p>
+<p><em>Italic</em> text next to each other without space<em>italic again</em></p>
+<p>Some <em>italic <strong>intercalated with</strong> bold</em> text and some <strong>bold <em>intercalated with</em> italic</strong> text</p>
+<p>**This is not bold** and *<strong>this is bold</strong></p>
+<p><strong>This should be bold</strong>*</p>
+<p><strong>Bold * asterisk</strong></p>
+<p>*This is not italic* and *<em>this is italic</em></p>
+<p><em>This should be italic</em>*</p>
+<p>~~This is not strikethrough~~ and ~<del>this is strikethrough</del></p>
+<p><del>This should be strikethrough</del>~</p>
+<p>&lt;u&gt;This is not underline, it&#39;s escaped HTML&lt;/u&gt;</p>
+<p><em>this is italic
+in multiple</em> <em>lines of text
+dwadwd dwadwa</em></p>
+<p>a&gt; ball &gt; jumping&gt;high</p>
+<p>  test&gt;&gt;GT&gt;&lt;&lt;LTconversion&lt; &lt;without spaces</p>
