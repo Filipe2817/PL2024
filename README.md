@@ -10,13 +10,11 @@ Cada trabalho prático tem uma pasta própria e contém um `README.md` com todos
 ## Trabalhos Práticos
 
 - **[TP1](/TP1/README.md) - Análise de Datasets de Exames Médicos Desportivos**
-- [TP2] - **TODO**
-- [TP3] - **TODO**
-- [TP4] - **TODO**
-- [TP5] - **TODO**
-- [TP6] - **TODO**
-- [TP7] - **TODO**
-- [TP8] - **TODO**
+- **[TP2](/TP2/README.md) - Conversor de Markdown para HTML**
+- **[TP3] - TODO**
+- **[TP4] - TODO**
+- **[TP5] - TODO**
+- **[TP6] - TODO**
 
 ## Licença
 

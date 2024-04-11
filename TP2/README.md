@@ -1,4 +1,4 @@
-# TP2
+# TP2 - Conversor de Markdown para HTML
 
 ## Autor: [Filipe Simões Pereira](https://github.com/Filipe2817), A100552
 
@@ -9,6 +9,7 @@
 - [Solução](#solução)
 - [Resultados](#resultados)
 - [Trabalho Futuro](#trabalho-futuro)
+- [Referências](#referências)
 
 ---
 
@@ -80,7 +81,7 @@ A substituição é trivial, basta usar o tamanho do 1º grupo para determinar o
 
 ### Bold
 
-O negrito tem de ser convertido antes do itálico porque usam sintaxes semelhantes e o negrito é mais abrangente.
+O negrito tem de ser convertido antes do itálico porque a sintaxe é semelhante e o negrito é mais abrangente.
 
 ```python
 def convert_bold(text):
@@ -109,7 +110,7 @@ def convert_italic(text):
 
 > - `(?<!\\)`: O caracter anterior não pode ser `\`, para evitar asteriscos ou underscores escapados
 > - `(\*|_)`: É capturado o 1º grupo, que contém `*` ou `_` para abrir a tag
-> - `([^*_\n]+(?:\n[^*_\n]+)*)`: É capturado o 2º grupo, que contém qualquer caracter que não seja `*`, `_` ou `\n` 1 ou mais vezes, seguido de um `\n` e o padrão anterior 0 ou mais vezes. Isto é usado para capturar itálico mesmo que esteja em linhas diferentes
+> - `([^*_\n]+(?:\n[^*_\n]+)*)`: É capturado o 2º grupo, que contém qualquer caracter que não seja `*`, `_` ou `\n` 1 ou mais vezes e um `\n` com padrão anterior 1 ou mais vezes, 0 ou mais vezes. Isto é usado para capturar itálico mesmo que esteja em linhas diferentes
 > - `\1`: O 1º grupo é repetido para fechar a tag
 
 Para a substituição, basta inserir o conteúdo capturado no 2º grupo entre as tags de itálico do HTML.
@@ -178,7 +179,7 @@ A sustituição é direta, basta substituir o símbolo escapado pelo símbolo or
 
 Casos mais complexos (`>` e `<` usados textualmente):
 
-> - `(^[ ]{4,}|(?<!<)(?<!</)\b\w+[ ]*)`: É capturado o 1º grupo, que pode conter 4 ou mais espaços (caso de blocos de código) no iníco da linha ou não pode conter `<` ou `</` antes de uma palavra completa seguida de 0 ou mais espaços (caso de tags HTML)
+> - `(^[ ]{4,}|(?<!<)(?<!</)\b\w+[ ]*)`: É capturado o 1º grupo, que pode conter 4 ou mais espaços (caso de blocos de código) no iníco da linha, ou não pode conter `<` ou `</` antes de uma palavra completa seguida de 0 ou mais espaços (caso de tags HTML)
 > - `(>+)`: É capturado o 2º grupo, que contém 1 ou mais `>`
 
 Esta expressão utiliza a flag `re.MULTILINE` para que o `^` corresponda ao início de cada linha.
@@ -209,7 +210,7 @@ Para substituir as correspondências, é chamada a função `process_blockquote`
 
 ### List
 
-As listas têm de ser convertidas depois do itálico porque podem usar asteriscos como *bullets*, que são casos mais específicos que o itálico.
+As listas têm de ser convertidas depois do itálico porque podem usar asteriscos como *bullets*.
 
 ```python
 def convert_list(text):
@@ -232,7 +233,7 @@ A substituição é feita chamando a função `process_list` que analisa os nív
 
 ### Image
 
-Imagens têm de ser convertidas antes de links porque usam uma sintaxe muito semelhante e imagens são mais específicas.
+Imagens têm de ser convertidas antes de links porque usam uma sintaxe muito semelhante e são mais específicas.
 
 ```python
 def convert_image(text):
@@ -267,7 +268,7 @@ def convert_line_break(text):
     return re.sub(pattern, "<br>", text)
 ```
 
-> - `([ ]{2,}|\\$)`: É capturado o 1º grupo, que contém 2 ou mais espaços, ou uma `\` no fim da linha
+> - `([ ]{2,}|\\$)\n`: É capturado o 1º grupo, que contém 2 ou mais espaços, ou uma `\` no fim da linha seguido de um `\n`
 
 Esta expressão utiliza a flag `re.MULTILINE` para que o `$` corresponda ao fim de cada linha do texto.
 A substituição é direta, basta substituir a correspondência por uma tag de quebra de linha.
@@ -286,7 +287,7 @@ def convert_horizontal_rule(text):
 > - `\n$`: A linha tem de terminar com um `\n`
 
 Esta expressão utiliza a flag `re.MULTILINE` para que o `^` e `$` correspondam ao início e fim de cada linha do texto.
-A substituição é direta, basta substituir a correspondência por uma tag de regra horizontal.
+A substituição é direta, basta substituir a correspondência por uma tag de regra horizontal com um `\n`.
 
 ### Fenced Code Block
 
@@ -329,14 +330,14 @@ def convert_code(text):
 ```
 
 > - `` (`{1,2}) ``: É capturado o 1º grupo, que contém 1 ou 2 `` ` `` para abrir a zona de código
-> - `([\s\S]+?)`: É capturado o 2º grupo, que contém qualquer caracter, incluindo caracteres de espaço em branco, 1 ou mais vezes (lazy) (conteúdo do bloco de código)
+> - `([\s\S]+?)`: É capturado o 2º grupo, que contém qualquer caracter, incluindo caracteres de espaço em branco, 1 ou mais vezes (lazy) (conteúdo da zona de código)
 > - `\1`: O 1º grupo é repetido para fechar a zona de código
 
 Para substituir, é necessário formatar a correspondência para remover os `\n` que existem antes e depois do conteúdo do bloco de código. Depois, basta inserir o conteúdo formatado entre as tags de código.
 
 #### Tentativas Falhadas
 
-- `(.+?)`: não apanha zonas de código com várias linhas; apanha zonas de código incorretas se os delimitadores forem 2 `` ` ``; apanha zonas de código incorretas se existirem `` ` `` no conteúdo
+- `` `(.+?)` ``: não apanha zonas de código com várias linhas; apanha zonas de código incorretas se os delimitadores forem 2 `` ` ``; apanha zonas de código incorretas se existirem `` ` `` no conteúdo
 
 ### Paragraph
 
@@ -347,7 +348,6 @@ def convert_paragraph(text):
     allowed_starts = r'[A-Za-z&\-\d*~#]|<(?:(?:u|strong|em|del|code)>|(?:a|img)[ ])'
     pattern = re.compile(rf'^[ ]{{0,3}}(?:{allowed_starts}).*(?:\n(?:{allowed_starts}).*)*', re.MULTILINE)
 
-    # there's no easy way to exclude matches inside code blocks
     code_block_pattern = re.compile(r'<pre><code.*?>[\s\S]*?</code></pre>')
     cb_intervals = [m.span() for m in re.finditer(code_block_pattern, text)]
 
@@ -360,15 +360,15 @@ def convert_paragraph(text):
 
 Expressão regular para identificar elementos que necessitam da conversão de parágrafos:
 
-> `[A-Za-z&\-\d*~#]`: Tem de existir um caracter alfabético, `&`, `-`, dígito, `*`, `~` ou `#`
-> `<(?:(?:u|strong|em|del|code)>|(?:a|img)[ ])`: Ou tem de existir uma tag de HTML do tipo `u`, `strong`, `em`, `del` ou `code`, ou tem de existir uma tag de HTML do tipo `a` ou `img`
+> - `[A-Za-z&\-\d*~#]`: Tem de existir um caracter alfabético, `&`, `-`, dígito, `*`, `~` ou `#`
+> - `<(?:(?:u|strong|em|del|code)>|(?:a|img)[ ])`: Ou tem de existir uma tag de HTML do tipo `u`, `strong`, `em`, `del` ou `code`, ou tem de existir uma tag de HTML do tipo `a` ou `img`
 
 Expressão regular para identificar parágrafos:
 
-> `^[ ]{0,3}`: No início da linha existem 0 a 3 espaços
-> `(?:{allowed_starts})`: Pode existir um dos caracteres permitidos no início do parágrafo
-> `.*`: Pode existir qualquer caracter 0 ou mais vezes
-> `(?:\n(?:{allowed_starts}).*)*`: Pode existir um `\n` seguido de um dos caracteres permitidos no início do parágrafo e qualquer caracter 0 ou mais vezes, 0 ou mais vezes
+> - `^[ ]{0,3}`: No início da linha existem 0 a 3 espaços
+> - `(?:{allowed_starts})`: Pode existir um dos caracteres permitidos no início do parágrafo
+> - `.*`: Pode existir qualquer caracter 0 ou mais vezes
+> - `(?:\n(?:{allowed_starts}).*)*`: Pode existir um `\n` seguido de um dos caracteres permitidos no início do parágrafo e qualquer caracter 0 ou mais vezes, 0 ou mais vezes
 
 Esta expressão utiliza a flag `re.MULTILINE` para que o `^` corresponda ao início de cada linha do texto.
 Para substituir, é necessário verificar se a correspondência está dentro de um bloco de código, porque não existe uma maneira simples de excluir correspondências dentro de blocos de código na expressão regular.
@@ -415,7 +415,7 @@ Este ficheiro contém o resultado esperado da conversão do input, com a utiliza
 ## Referências
 
 - [Markdown to HTML](https://codebeautify.org/markdown-to-html)
-- [Markdown Spec](https://spec.commonmark.org/0.31.2/)
+- [Markdown Spec (CommonMark)](https://spec.commonmark.org/0.31.2/)
 - [Markdown Basic Syntax](https://www.markdownguide.org/basic-syntax)
 
 ---
