@@ -80,6 +80,8 @@ A substituição é trivial, basta usar o tamanho do 1º grupo para determinar o
 
 ### Bold
 
+O negrito tem de ser convertido antes do itálico porque usam sintaxes semelhantes e o negrito é mais abrangente.
+
 ```python
 def convert_bold(text):
     pattern = r'(\*\*|__)([^*_].+?)\1'
@@ -98,8 +100,6 @@ Para a substituição, basta inserir o conteúdo capturado no 2º grupo entre as
 - `(\*\*|__)([^*_]+?)\1`: não apanha bold com asteriscos ou underscores no conteúdo
 
 ### Italic
-
-O itálico tem de ser convertido depois do bold porque usam a mesma sintaxe e o bold é mais abrangente.
 
 ```python
 def convert_italic(text):
@@ -318,21 +318,29 @@ Para a substituição, basta associar o conteúdo capturado no 1º grupo à clas
 
 ```python
 def convert_code(text):
-    pattern = r'(`{1,2})([\s\S]+?)\1' # could use re.DOTALL to match newlines
+    pattern = r'(`{1,2})([\s\S]+?)\1'
 
     def replace(match):
         pattern2 = r'^[ ](.*)[ ]$'
-        formatted_content = re.sub(pattern2, r'\1', match.group(2).replace("\n", " ")) # replace function to avoid another re.sub
+        formatted_content = re.sub(pattern2, r'\1', match.group(2).replace("\n", " "))
         return f"<code>{formatted_content}</code>"
 
     return re.sub(pattern, replace, text)
 ```
 
+> - `` (`{1,2}) ``: É capturado o 1º grupo, que contém 1 ou 2 `` ` `` para abrir a zona de código
+> - `([\s\S]+?)`: É capturado o 2º grupo, que contém qualquer caracter, incluindo caracteres de espaço em branco, 1 ou mais vezes (lazy) (conteúdo do bloco de código)
+> - `\1`: O 1º grupo é repetido para fechar a zona de código
+
+Para substituir, é necessário formatar a correspondência para remover os `\n` que existem antes e depois do conteúdo do bloco de código. Depois, basta inserir o conteúdo formatado entre as tags de código.
+
 #### Tentativas Falhadas
 
-- `(.+?)`
+- `(.+?)`: não apanha zonas de código com várias linhas; apanha zonas de código incorretas se os delimitadores forem 2 `` ` ``; apanha zonas de código incorretas se existirem `` ` `` no conteúdo
 
 ### Paragraph
+
+Parágrafos têm de ser convertidos no fim para evitar que afetem outros elementos. Isto torna a conversão mais fácil com uma expressão regular mais simples, porque basta identificar o que ainda não foi convertido e excluir o que já foi.
 
 ```python
 def convert_paragraph(text):
@@ -341,7 +349,7 @@ def convert_paragraph(text):
 
     # there's no easy way to exclude matches inside code blocks
     code_block_pattern = re.compile(r'<pre><code.*?>[\s\S]*?</code></pre>')
-    cb_intervals = [m.span() for m in re.finditer(code_block_pattern, text)] # m.span() == (m.start(), m.end())
+    cb_intervals = [m.span() for m in re.finditer(code_block_pattern, text)]
 
     def allowed_sub(match):
         result = not any(start <= match.start() <= end and start <= match.end() <= end for start, end in cb_intervals)
@@ -350,13 +358,30 @@ def convert_paragraph(text):
     return pattern.sub(allowed_sub, text)
 ```
 
+Expressão regular para identificar elementos que necessitam da conversão de parágrafos:
+
+> `[A-Za-z&\-\d*~#]`: Tem de existir um caracter alfabético, `&`, `-`, dígito, `*`, `~` ou `#`
+> `<(?:(?:u|strong|em|del|code)>|(?:a|img)[ ])`: Ou tem de existir uma tag de HTML do tipo `u`, `strong`, `em`, `del` ou `code`, ou tem de existir uma tag de HTML do tipo `a` ou `img`
+
+Expressão regular para identificar parágrafos:
+
+> `^[ ]{0,3}`: No início da linha existem 0 a 3 espaços
+> `(?:{allowed_starts})`: Pode existir um dos caracteres permitidos no início do parágrafo
+> `.*`: Pode existir qualquer caracter 0 ou mais vezes
+> `(?:\n(?:{allowed_starts}).*)*`: Pode existir um `\n` seguido de um dos caracteres permitidos no início do parágrafo e qualquer caracter 0 ou mais vezes, 0 ou mais vezes
+
+Esta expressão utiliza a flag `re.MULTILINE` para que o `^` corresponda ao início de cada linha do texto.
+Para substituir, é necessário verificar se a correspondência está dentro de um bloco de código, porque não existe uma maneira simples de excluir correspondências dentro de blocos de código na expressão regular.
+Caso a correspondência não esteja dentro de um bloco de código, basta inserir o conteúdo entre as tags de parágrafo.
+
 ### Clear Empty Lines
+
+Esta função não é de todo necessária e serve apenas para eliminar linhas vazias.
 
 ```python
 def clear_empty_lines(text):
     pattern = r'\n{2,}'
 
-    # again, code block problems
     code_block_pattern = re.compile(r'<pre><code.*?>[\s\S]*?</code></pre>')
     cb_intervals = [m.span() for m in re.finditer(code_block_pattern, text)]
 
@@ -367,17 +392,29 @@ def clear_empty_lines(text):
     return re.sub(pattern, allowed_sub, text)
 ```
 
+A substituição é direta, basta substituir 2 ou mais `\n` por um único `\n`. No entanto, mais uma vez é necessário excluir zonas de bloco de código para não afetar o seu conteúdo.
+
 ## Resultados
+
+Os resultados obtidos com o programa são satisfatórios, mas ainda existem muitas limitações. A conversão de Markdown para HTML é um processo complexo e com muitos detalhes que podem ser difíceis de identificar e tratar.
+
+A execução do programa com o input [input.md](input.md) gera o resultado no ficheiro [output.html](output.html).
+
+![Output tp2](/images/tp2-output.png)
+
+Como é possível observar na imagem acima, foi utilizado o ficheiro [expected-output.html](expected-output.html) para testar e verificar a correção do programa.
+Este ficheiro contém o resultado esperado da conversão do input, com a utilização do conversor online [Markdown to HTML](https://codebeautify.org/markdown-to-html).
 
 ## Trabalho Futuro
 
-- combinações tipo listas dentro de blockquotes
-- tornar os regex mais genéricos para cobrir mais casos e até juntar varias funções numa só
-- cobrir mais casos do commonmark (novas bullets começam novas listas, por exemplo)
+- Suportar toda a sintaxe do Markdown e as possíveis combinações de elementos
+- Tornar as expressões regulares mais genéricas para cobrir mais casos e até identificar elementos diferentes com a mesma expressão
+- Respeitar todas as convenções do Markdown presentes no [CommonMark](https://spec.commonmark.org/0.31.2/)
+- Criar um programa de formatação de HTML para gerar HTML mais legível e organizado
 
 ## Referências
 
-- [Markdown to HTML Converter](https://codebeautify.org/markdown-to-html)
+- [Markdown to HTML](https://codebeautify.org/markdown-to-html)
 - [Markdown Spec](https://spec.commonmark.org/0.31.2/)
 - [Markdown Basic Syntax](https://www.markdownguide.org/basic-syntax)
 
