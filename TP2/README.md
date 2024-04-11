@@ -14,44 +14,358 @@
 
 ## Objetivos do Trabalho
 
+Criar um conversor de Markdown para HTML, com suporte para os elementos descritos na *"Basic Syntax"* da [Cheat Sheet](https://www.markdownguide.org/cheat-sheet/)
+
 ## Requisitos para Utilização
+
+Para utilizar o programa, é necessário ter Python 3.11+ instalado e um ficheiro **"output.html"**.
+
+O conjunto de dados deve ser fornecido ao programa através do ***standard input***. É possível converter um ficheiro de Markdown já existente utilizando piping (`cat {file} | python3 tp2.py`) ou redirecionamento de ficheiros (`python3 tp2.py < {file}`).
 
 ## Solução
 
-### Failed Attempts
+Optou-se por utilizar expressões regulares para identificar os elementos do Markdown e substituí-los pelos elementos HTML correspondentes.
+Para isso, em vez de uma leitura linha a linha, o programa lê o input na sua totalidade e as expressões regulares identificam todos os elementos presentes no texto.
 
-#### Headers
+É importante referir que a ordem das expressões regulares é importante, pois a ordem em que os elementos são substituídos pode afetar o resultado final.
 
-- ^\s*(#{1,6})\s+(.*)$ does not match empty headers
+```python
+conversion_functions = [
+    convert_header,
+    convert_bold,
+    convert_italic,
+    convert_strikethrough,
+    convert_ambiguous_symbols,
+    convert_blockquote,
+    convert_list,
+    convert_image,
+    convert_link,
+    convert_line_break,
+    convert_horizontal_rule,
+    convert_fenced_code_block,
+    convert_code,
+    convert_paragraph,
+    clear_empty_lines
+]
+```
 
-#### Bold
+As funções de conversão apresentadas acima são chamadas sequencialmente na ordem em que estão dispostas e serão abordadas com mais detalhe em seguida.
 
-- ([*|_]{1,2})(.+?)\1
-- (\*\*|__)([^*_]+?)\1 does not match * inside
-- generic hard
+### Headers
 
-#### Italic
+```python
+def convert_header(text):
+    pattern = re.compile(r'^[ ]{0,3}(#{1,6})(?:[ ]+(.*)|\n)$', re.MULTILINE)
 
-- \*(.+?)\*
-- (\*|_)([^*_]+?)\1 matches lists with asterisk bullets, does not match italic in different lines, matches escaped asterisks
+    def replace(match):
+        level = len(match.group(1))
+        content = match.group(2) if match.group(2) else ""
+        return f"<h{level}>{content}</h{level}>"
+    
+    return re.sub(pattern, replace, text)
+```
 
-#### Full Blockquotes
+Para identificar headers utiliza-se a expressão regular `^[ ]{0,3}(#{1,6})(?:[ ]+(.*)|\n)$`, com a flag `re.MULTILINE` para que o `^` e `$` correspondam ao início e fim de cada linha, respetivamente.
 
-- ^(>[^\n]*(?:\n>[^\n]+)*)
-- ^(>.*(?:\n>.*)*)
+> - `^[ ]{0,3}`: No início da linha existem 0 a 3 espaços
+> - `(#{1,6})`: É capturado o 1º grupo, que contém entre 1 e 6 `#` para identificar o nível do header
+> - `(?:[ ]+(.*)|\n)`: Podem existir 1 ou mais espaços seguidos de qualquer caracter 0 ou mais vezes (2º grupo capturado), ou um `\n`
+> - `$`: A correspondência termina no fim da linha
 
-#### List
+A substituição é trivial, basta usar o tamanho do 1º grupo para determinar o nível do header e inserir o conteúdo capturado no 2º grupo, caso exista.
 
-- (?:^|\n)(?:\d+\.|[+*-])[ ]+(?:.*(?:\n[ ]{0,4}\S.*)*)
-- (?:\d+\.|[+*-])(?:[ ]+(?:.*(?:\n[ ]*\S.*)*))?
-- (?:^|\n)(?:\d+\.|[+*-])(?:[ ]*(?:.*(?:\n[ ]*\S.*)*)*)?
-- (?<=^|\n)[ ]*(?:\d+\.|[+*-])[ ]+(?:.*(?:\n[ ]*\S.*)*)*
-- (?<=\A|\n{2})[ ]*(?:\d+\.|[+*-])[ ]*(?:.*(?:\n[ ]*\S.*)*)*
-- (?<=\A|\n{2})[ ]*(?:\d+\.|[+*-])(?:.*(?:\n[ ]*\S.*)*)*
+#### Tentativas Falhadas
 
-#### Code
+- `^\s*(#{1,6})\s+(.*)$`: apanha headers que deviam ser blocos de código; não apanha headers sem conteúdo
+
+### Bold
+
+```python
+def convert_bold(text):
+    pattern = r'(\*\*|__)([^*_].+?)\1'
+    return re.sub(pattern, lambda m: f"<strong>{m.group(2)}</strong>", text)
+```
+
+> - `(\*\*|__)`: É capturado o 1º grupo, que contém 2 `*` ou `_` para abrir a tag
+> - `([^*_].+?)`: É capturado o 2º grupo, que contém qualquer caracter que não seja `*` ou `_` seguido de qualquer caracter 1 ou mais vezes (lazy)
+> - `\1`: O 1º grupo é repetido para fechar a tag
+
+Para a substituição, basta inserir o conteúdo capturado no 2º grupo entre as tags de negrito do HTML.
+
+#### Tentativas Falhadas
+
+- `([*|_]{1,2})(.+?)\1`: apanha tags incorretas (ex: \*\_bold\*\_; \*bold\*); não apanha bold com asteriscos ou underscores no conteúdo; falha em casos de bold com itálico
+- `(\*\*|__)([^*_]+?)\1`: não apanha bold com asteriscos ou underscores no conteúdo
+
+### Italic
+
+O itálico tem de ser convertido depois do bold porque usam a mesma sintaxe e o bold é mais abrangente.
+
+```python
+def convert_italic(text):
+    pattern = r'(?<!\\)(\*|_)([^*_\n]+(?:\n[^*_\n]+)*)\1'
+    return re.sub(pattern, lambda m: f"<em>{m.group(2)}</em>", text)
+```
+
+> - `(?<!\\)`: O caracter anterior não pode ser `\`, para evitar asteriscos ou underscores escapados
+> - `(\*|_)`: É capturado o 1º grupo, que contém `*` ou `_` para abrir a tag
+> - `([^*_\n]+(?:\n[^*_\n]+)*)`: É capturado o 2º grupo, que contém qualquer caracter que não seja `*`, `_` ou `\n` 1 ou mais vezes, seguido de um `\n` e o padrão anterior 0 ou mais vezes. Isto é usado para capturar itálico mesmo que esteja em linhas diferentes
+> - `\1`: O 1º grupo é repetido para fechar a tag
+
+Para a substituição, basta inserir o conteúdo capturado no 2º grupo entre as tags de itálico do HTML.
+
+#### Tentativas Falhadas
+
+- `\*(.+?)\*`: não apanha itálico com underscores; falha em casos de itálico em linhas diferentes; apanha asteriscos escapados
+- `(\*|_)([^*_]+?)\1`: apanha listas que usam asteriscos como bullets; apanha asteriscos escapados
+
+### Strikethrough
+
+```python
+def convert_strikethrough(text):
+    pattern = r'~~([^~].+?)~~'
+    return re.sub(pattern, lambda m: f"<del>{m.group(1)}</del>", text)
+```
+
+> - `~~`: São capturados 2 `~` para abrir a tag
+> - `([^~].+?)`: É capturado o conteúdo, que não pode começar com `~`, seguido de qualquer caracter 1 ou mais vezes (lazy)
+> - `~~`: São capturados 2 `~` para fechar a tag
+
+Para a substituição, basta inserir o conteúdo capturado no 1º grupo entre as tags de texto riscado do HTML.
+
+### Ambiguous Symbols
+
+Alguns símbolos têm significados especiais em HTML e é necessário identificar e tratar esses casos de acordo com o contexto em que aparecem.
+
+Nesta função, são tratados alguns símbolos como `<`, `>`, `"`, `'`, `*`, `_` e `~`. Muitas vezes, estes símbolos são escapados e deixam de ter significado especial, mas é necessário converter os escapes para os símbolos originais. Esta função tem de ser chamada após as funções que utilizam estes símbolos nos seus padrões para facilitar a identificação e conversão dos mesmos.
+
+```python
+LT = "&lt;"
+GT = "&gt;"
+QUOTE = "&quot;"
+APOSTROPHE = "&#39;"
+
+def convert_ambiguous_symbols(text):
+    symbols = [
+        (r'\\<', LT),
+        (r'\\>', GT),
+        (r'"', QUOTE),
+        (r'\'', APOSTROPHE),
+        (r'\\\*', '*'),
+        (r'\\_', '_'),
+        (r'\\~', '~'),
+        (r'(^[ ]{4,}|(?<!<)(?<!</)\b\w+[ ]*)(>+)', lambda m: m.group(1) + GT * len(m.group(2)), re.MULTILINE),
+        (r'(<+)(?!\w+>|/)', lambda m: LT * len(m.group(1)))
+    ]
+    
+    for pattern, replacement, *args in symbols:
+        text = re.sub(pattern, replacement, text, flags=functools.reduce(lambda x, y: x | y, args, 0))
+    
+    return text
+```
+
+Casos simples:
+
+> - `\\<`: Apanha `<` escapado
+> - `\\>`: Apanha `>` escapado
+> - `"`: Apanha aspas
+> - `\'`: Apanha apóstrofo
+> - `\\\*`: Apanha asterisco escapado
+> - `\\_`: Apanha underscore escapado
+> - `\\~`: Apanha til escapado
+
+A sustituição é direta, basta substituir o símbolo escapado pelo símbolo original.
+
+Casos mais complexos (`>` e `<` usados textualmente):
+
+> - `(^[ ]{4,}|(?<!<)(?<!</)\b\w+[ ]*)`: É capturado o 1º grupo, que pode conter 4 ou mais espaços (caso de blocos de código) no iníco da linha ou não pode conter `<` ou `</` antes de uma palavra completa seguida de 0 ou mais espaços (caso de tags HTML)
+> - `(>+)`: É capturado o 2º grupo, que contém 1 ou mais `>`
+
+Esta expressão utiliza a flag `re.MULTILINE` para que o `^` corresponda ao início de cada linha.
+Para fazer a substituição, mantém-se o 1º grupo e adiciona-se `>` tantas vezes quantas as capturadas no 2º grupo.
+
+> - `(<+)`: É capturado o 1º grupo, que contém 1 ou mais `<`
+> - `(?!\w+>|/)`: O 1º grupo não pode ser seguido por uma palavra seguida de `>`, nem pode ser seguido de `/` (caso de tags HTML)
+
+Para fazer a substituição, adiciona-se `<` tantas vezes quantas as capturadas no 1º grupo.
+
+### Blockquote
+
+```python
+def convert_blockquote(text):
+    comp_pattern = re.compile(r'^(>.*(?:\n.+)*)', re.MULTILINE)
+    return comp_pattern.sub(process_blockquote, text)
+```
+
+> - `^(>.*(?:\n.+)*)`: É capturado o 1º grupo, que, no início da linha, contém um `>` seguido de qualquer caracter 0 ou mais vezes; pode ser seguido de um `\n` e qualquer caracter 1 ou mais vezes, 0 ou mais vezes
+
+Esta expressão utiliza a flag `re.MULTILINE` para que o `^` corresponda ao início de cada linha.
+Para substituir as correspondências, é chamada a função `process_blockquote` que analisa os níveis de aninhamento de cada correspondência para gerar o HTML corretamente.
+
+#### Tentativas Falhadas
+
+- `^(>[^\n]*(?:\n>[^\n]+)*)`: não apanha blockquotes na sua totalidade se existirem `>` singulares sem conteúdo no meio (`>\n`)
+- `^(>.*(?:\n>.*)*)`: não apanha blockquotes na sua totalidade que não tenham o `>` em todas as linhas (ex: `> test\nblockquote`)
+
+### List
+
+As listas têm de ser convertidas depois do itálico porque podem usar asteriscos como *bullets*, que são casos mais específicos que o itálico.
+
+```python
+def convert_list(text):
+    comp_pattern = re.compile(r'(?:(?<=\A)|(?<=\n{2}))[ ]*(?:\d+\.|[+*-])(?=\s).*(?:\n[ ]*.+)*')
+    return comp_pattern.sub(process_list, text)
+```
+
+> - `(?:(?<=\A)|(?<=\n{2}))`: A correspondência tem de estar no início do texto ou depois de 2 `\n` (listas precisam de uma linha em branco antes de começarem)
+> - `[ ]*(?:\d+\.|[+*-])`: Podem existir 0 ou mais espaços seguidos de um número e um ponto ou um dos caracteres `+`, `*` ou `-` (identificadores de listas)
+> - `(?=\s)`: O identificador tem de ser seguido de qualquer caracter que seja um espaço em branco (espaço, `\n`, etc)
+> - `.*`: Pode existir qualquer caracter 0 ou mais vezes (existência de conteúdo na lista)
+> - `(?:\n[ ]*.+)*`: Pode existir um `\n` seguido de 0 ou mais espaços e qualquer caracter 1 ou mais vezes, 0 ou mais vezes (linhas adicionais da lista)
+
+A substituição é feita chamando a função `process_list` que analisa os níveis de aninhamento, o tipo de lista e o conteúdo de cada correspondência para gerar o HTML corretamente.
+
+#### Tentativas Falhadas
+
+- `(?:^|\n)(?:\d+\.|[+*-])[ ]+(?:.*(?:\n[ ]{0,4}\S.*)*)`: apanha linha vazia antes da lista; não apanha listas sem conteúdo; não apanha listas que comecem identadas
+- `(?:\d+\.|[+*-])(?:[ ]+(?:.*(?:\n[ ]*\S.*)*))?`: apanha elementos que não são listas; apanha os identificadores das listas sem conteúdo separadamente
+
+### Image
+
+Imagens têm de ser convertidas antes de links porque usam uma sintaxe muito semelhante e imagens são mais específicas.
+
+```python
+def convert_image(text):
+    pattern = r'!\[(.*?)\]\((.*?)\)'
+    return re.sub(pattern, lambda m: f"<img src=\"{m.group(2)}\" alt=\"{m.group(1)}\">", text)
+```
+
+> - `!`: É necessário que exista um `!`
+> - `\[(.*?)\]`: É capturado o 1º grupo, que contém qualquer caracter 0 ou mais vezes (lazy) entre parêntesis retos (texto alternativo da imagem)
+> - `\((.*?)\)`: É capturado o 2º grupo, que contém qualquer caracter 0 ou mais vezes (lazy) entre parêntesis (URL da imagem)
+
+Para substituir basta criar uma tag de imagem com *src* a receber o conteúdo capturado no 2º grupo e *alt* a receber o conteúdo capturado no 1º grupo.
+
+### Link
+
+```python
+def convert_link(text):
+    pattern = r'\[(.*?)\]\((.*?)\)'
+    return re.sub(pattern, lambda m: f"<a href=\"{m.group(2)}\">{m.group(1)}</a>", text)
+```
+
+> - `\[(.*?)\]`: É capturado o 1º grupo, que contém qualquer caracter 0 ou mais vezes (lazy) entre parêntesis retos (texto do link)
+> - `\((.*?)\)`: É capturado o 2º grupo, que contém qualquer caracter 0 ou mais vezes (lazy) entre parêntesis (URL do link)
+
+Para substituir basta criar uma tag de *anchor* com *href* a receber o conteúdo capturado no 2º grupo e inserir o conteúdo capturado no 1º grupo entre as tags.
+
+### Line Break
+
+```python
+def convert_line_break(text):
+    pattern = re.compile(r'([ ]{2,}|\\$)\n', re.MULTILINE)
+    return re.sub(pattern, "<br>", text)
+```
+
+> - `([ ]{2,}|\\$)`: É capturado o 1º grupo, que contém 2 ou mais espaços, ou uma `\` no fim da linha
+
+Esta expressão utiliza a flag `re.MULTILINE` para que o `$` corresponda ao fim de cada linha do texto.
+A substituição é direta, basta substituir a correspondência por uma tag de quebra de linha.
+
+### Horizontal Rule
+
+```python
+def convert_horizontal_rule(text):
+    pattern = re.compile(r'^\n(-|\*|_)\1{2,}\n$', re.MULTILINE)
+    return pattern.sub("<hr>\n", text)
+```
+
+> - `^\n`: A linha tem de começar com um `\n`
+> - `(-|\*|_)`: É capturado o 1º grupo, que contém `-`, `*` ou `_`
+> - `\1{2,}`: O 1º grupo é repetido 2 ou mais vezes
+> - `\n$`: A linha tem de terminar com um `\n`
+
+Esta expressão utiliza a flag `re.MULTILINE` para que o `^` e `$` correspondam ao início e fim de cada linha do texto.
+A substituição é direta, basta substituir a correspondência por uma tag de regra horizontal.
+
+### Fenced Code Block
+
+Blocos de código têm de ser convertidos antes de código inline porque usam uma sintaxe muito semelhante e são mais específicos.
+
+```python
+def convert_fenced_code_block(text):
+    pattern = r'`{3}(.+)?\n([\s\S]*?)\n`{3}'
+
+    def replace(match):
+        res = f"{match.group(2)}\n</code></pre>"
+        if match.group(1) is None:
+            res = f"<pre><code>{res}"       
+        else:
+            res = f"<pre><code class=\"language-{match.group(1)}\">{res}"
+        return res
+
+    return re.sub(pattern, replace, text)
+```
+
+> - `` `{3} ``: São capturados 3 `` ` `` para abrir o bloco de código
+> - `(.+)?\n`: É capturado o 1º grupo, que pode ou não existir e contém qualquer caracter 1 ou mais vezes (linguagem do bloco de código) seguido de um `\n`
+> - `([\s\S]*?)\n`: É capturado o 2º grupo, que contém qualquer caracter, incluindo caracteres de espaço em branco, 0 ou mais vezes (lazy) (conteúdo do bloco de código) seguido de um `\n`
+> - `` `{3} ``: São capturados 3 `` ` `` para fechar o bloco de código
+
+Para a substituição, basta associar o conteúdo capturado no 1º grupo à classe do bloco de código, caso exista, e inserir o conteúdo capturado no 2º grupo entre as tags de bloco de código.
+
+### Code
+
+```python
+def convert_code(text):
+    pattern = r'(`{1,2})([\s\S]+?)\1' # could use re.DOTALL to match newlines
+
+    def replace(match):
+        pattern2 = r'^[ ](.*)[ ]$'
+        formatted_content = re.sub(pattern2, r'\1', match.group(2).replace("\n", " ")) # replace function to avoid another re.sub
+        return f"<code>{formatted_content}</code>"
+
+    return re.sub(pattern, replace, text)
+```
+
+#### Tentativas Falhadas
 
 - `(.+?)`
+
+### Paragraph
+
+```python
+def convert_paragraph(text):
+    allowed_starts = r'[A-Za-z&\-\d*~#]|<(?:(?:u|strong|em|del|code)>|(?:a|img)[ ])'
+    pattern = re.compile(rf'^[ ]{{0,3}}(?:{allowed_starts}).*(?:\n(?:{allowed_starts}).*)*', re.MULTILINE)
+
+    # there's no easy way to exclude matches inside code blocks
+    code_block_pattern = re.compile(r'<pre><code.*?>[\s\S]*?</code></pre>')
+    cb_intervals = [m.span() for m in re.finditer(code_block_pattern, text)] # m.span() == (m.start(), m.end())
+
+    def allowed_sub(match):
+        result = not any(start <= match.start() <= end and start <= match.end() <= end for start, end in cb_intervals)
+        return f"<p>{match.group(0)}</p>" if result else match.group(0)
+
+    return pattern.sub(allowed_sub, text)
+```
+
+### Clear Empty Lines
+
+```python
+def clear_empty_lines(text):
+    pattern = r'\n{2,}'
+
+    # again, code block problems
+    code_block_pattern = re.compile(r'<pre><code.*?>[\s\S]*?</code></pre>')
+    cb_intervals = [m.span() for m in re.finditer(code_block_pattern, text)]
+
+    def allowed_sub(match):
+        result = not any(start <= match.start() <= end and start <= match.end() <= end for start, end in cb_intervals)
+        return f"\n" if result else match.group(0)
+    
+    return re.sub(pattern, allowed_sub, text)
+```
 
 ## Resultados
 
@@ -64,7 +378,7 @@
 ## Referências
 
 - [Markdown to HTML Converter](https://codebeautify.org/markdown-to-html)
-- [Markdown Spec](https://spec.commonmark.org/0.28/#list-items)
+- [Markdown Spec](https://spec.commonmark.org/0.31.2/)
 - [Markdown Basic Syntax](https://www.markdownguide.org/basic-syntax)
 
 ---

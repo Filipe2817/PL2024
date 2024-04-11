@@ -7,7 +7,7 @@ import functools
 ##### Headers
 
 def convert_header(text):
-    pattern = re.compile(r'^[ ]{0,3}(#{1,6})(?:[ ]+(.*)|\n)$', re.MULTILINE) 
+    pattern = re.compile(r'^[ ]{0,3}(#{1,6})(?:[ ]+(.*)|\n)$', re.MULTILINE)
     # re.MULTILINE is needed to match the start of each line, since we're passing the whole text at once
     def replace(match):
         level = len(match.group(1))
@@ -25,7 +25,7 @@ def convert_bold(text):
 ##### Italic
 
 def convert_italic(text):
-    pattern = r'(?![ ]*\*[ ])(?<!\\)(\*|_)([^*_\n]+(?:\n[^*_\n]+)*)\1'
+    pattern = r'(?<!\\)(\*|_)([^*_\n]+(?:\n[^*_\n]+)*)\1'
     return re.sub(pattern, lambda m: f"<em>{m.group(2)}</em>", text)
 
 ##### Blockquotes
@@ -63,7 +63,7 @@ def process_blockquote(match):
 ##### Lists
 
 def convert_list(text):
-    comp_pattern = re.compile(r'(?:(?<=\A)|(?<=\n{2}))[ ]*(?:\d+\.|[+*-])(?=\s)(?:[ ]*(?:.*(?:\n[ ]*\S.*)*)*|\s*)')
+    comp_pattern = re.compile(r'(?:(?<=\A)|(?<=\n{2}))[ ]*(?:\d+\.|[+*-])(?=\s).*(?:\n[ ]*.+)*')
     return comp_pattern.sub(process_list, text)
 
 def process_list(match):
@@ -183,7 +183,7 @@ def convert_ambiguous_symbols(text):
         (r'\\\*', '*'),
         (r'\\_', '_'),
         (r'\\~', '~'),
-        (r'(^[ ]{4,}|(?<!<)(?<!</)\b\w+[ ]*)(>+)([ ]*)', lambda m: m.group(1) + GT * len(m.group(2)) + m.group(3), re.MULTILINE), # preserve the other parts of the match
+        (r'(^[ ]{4,}|(?<!<)(?<!</)\b\w+[ ]*)(>+)', lambda m: m.group(1) + GT * len(m.group(2)), re.MULTILINE), # preserve the other parts of the match
         (r'(<+)(?!\w+>|/)', lambda m: LT * len(m.group(1)))
     ]
     
