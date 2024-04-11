@@ -19,9 +19,9 @@ Criar um conversor de Markdown para HTML, com suporte para os elementos descrito
 
 ## Requisitos para Utilização
 
-Para utilizar o programa, é necessário ter Python 3.11+ instalado e um ficheiro **"output.html"**.
+Para utilizar o programa, é necessário ter Python 3.11+ instalado e um ficheiro **"output.html"**, onde será guardado o resultado da conversão.
 
-O conjunto de dados deve ser fornecido ao programa através do ***standard input***. É possível converter um ficheiro de Markdown já existente utilizando piping (`cat {file} | python3 tp2.py`) ou redirecionamento de ficheiros (`python3 tp2.py < {file}`).
+O texto a ser convertido deve ser fornecido ao programa através do ***standard input***. É possível converter um ficheiro de Markdown já existente utilizando piping (`cat {file} | python3 tp2.py`) ou redirecionamento de ficheiros (`python3 tp2.py < {file}`).
 
 ## Solução
 
