@@ -1,0 +1,22 @@
+Welcome to Smart Home Control Panel.
+Today's weather forecast: Sunny with a high of -28°C.
+Turn the outdoor lights ON. Set brightness = 80.
+Start the coffee machine.
+Increase thermostat setting by 2.5 degrees.
+Turn ON the air conditioner. Set temperature = 23.5°C.
+Adjust blinds to 50%.
+Play favorite playlist.
+Dim the bedroom lights to 40%.
+Set alarm for 7:15 AM.
+Increase music volume by 10%.
+Turn OFF the TV.
+Send notification to phone.
+Switch off all devices before leaving.
+On the way back home, at 6:30 PM, turn ON the porch lights.
+Check the temperature = -24.3°C.
+Activate security system with 99.8% sensitivity.
+Turn oN/OfF the alarm.
+It's .4 miles to the nearest grocery store.
+Increase speed by 1.2.
+
+DONE:-0.8=
