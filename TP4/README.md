@@ -1,4 +1,4 @@
-# TP4 - Título do Trabalho
+# TP4 - Analisador Léxico SQL
 
 ## Autor: [Filipe Simões Pereira](https://github.com/Filipe2817), A100552
 
@@ -14,6 +14,12 @@
 ---
 
 ## Objetivos do Trabalho
+
+Construir um analisador léxico para uma liguagem de query com a qual se podem escrever frases do género:
+
+```sql
+Select id, nome, salario From empregados Where salario >= 820
+```
 
 ## Requisitos para Utilização
 

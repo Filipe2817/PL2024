@@ -11,8 +11,8 @@ Cada trabalho prático tem uma pasta própria e contém um `README.md` com todos
 
 - **[TP1](/TP1/README.md) - Análise de Datasets de Exames Médicos Desportivos**
 - **[TP2](/TP2/README.md) - Conversor de Markdown para HTML**
-- **[TP3] - TODO**
-- **[TP4] - TODO**
+- **[TP3](/TP3/README.md) - Somador ON/OFF**
+- **[TP4](/TP4/README.md) - Analisador Léxico SQL**
 - **[TP5] - TODO**
 - **[TP6] - TODO**
 
