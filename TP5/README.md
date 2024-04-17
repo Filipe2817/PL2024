@@ -1,4 +1,4 @@
-# TP5 - Título do Trabalho
+# TP5 - Máquina de Vending
 
 ## Autor: [Filipe Simões Pereira](https://github.com/Filipe2817), A100552
 
