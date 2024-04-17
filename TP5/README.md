@@ -38,6 +38,8 @@ Comandos:
 
 ## Trabalho Futuro
 
+- Resolver bug de adicionar produtos com nome com espaços (split() rebenta o programa)
+
 ## Referências
 
 ---
