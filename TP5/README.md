@@ -15,7 +15,20 @@
 
 ## Objetivos do Trabalho
 
+Construção de um programa que simule uma máquina de vending.
+Os dados da máquina persistem num ficheiro json.
+
 ## Requisitos para Utilização
+
+Comandos:
+
+- `listar`: Mostra todos os produtos disponíveis (código, nome, quantidade e preço)
+- `moeda <valor> .`: Adiciona moedas ao saldo, onde `<valor>` é um tipo de moeda (2e, 1e, 50c, 20c, 10c, 5c, 2c, 1c) que pode pode ser separado por espaços e virgulas opcionalmente e termina a inserção de moedas com um ponto final
+- `selecionar <código>`: Seleciona um produto para compra, onde `<código>` é o código do produto (letra e 2 números)
+- `saldo`: Mostra o saldo atual
+- `sair`: Devolve o troco e termina o programa
+- `novo <código> "<nome>" <quantidade> <preço>`: Adiciona um novo produto, com código não existente, nome (entre aspas), quantidade e preço
+- `reabastece <código> <quantidade>`: Adiciona quantidade ao produto com o código especificado (o produto tem de existir)
 
 ## Solução
 

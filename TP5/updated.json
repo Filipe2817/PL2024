@@ -1,0 +1,56 @@
+{
+    "items": [
+        {
+            "cod": "A23",
+            "nome": "água 0.5L",
+            "quant": 4,
+            "preco": 0.7
+        },
+        {
+            "cod": "A34",
+            "nome": "lanche misto",
+            "quant": 4,
+            "preco": 1.1
+        },
+        {
+            "cod": "B45",
+            "nome": "refrigerante lata",
+            "quant": 4,
+            "preco": 1.5
+        },
+        {
+            "cod": "B46",
+            "nome": "barras de cereal",
+            "quant": 10,
+            "preco": 0.9
+        },
+        {
+            "cod": "C12",
+            "nome": "chocolate",
+            "quant": 7,
+            "preco": 1.0
+        },
+        {
+            "cod": "E01",
+            "nome": "croissant",
+            "quant": 4,
+            "preco": 0.8
+        },
+        {
+            "cod": "E02",
+            "nome": "bolo",
+            "quant": 9,
+            "preco": 0.75
+        }
+    ],
+    "coins": {
+        "2e": 10,
+        "1e": 9,
+        "50c": 16,
+        "20c": 12,
+        "10c": 18,
+        "5c": 29,
+        "2c": 30,
+        "1c": 25
+    }
+}
