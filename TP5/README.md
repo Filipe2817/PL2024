@@ -20,6 +20,8 @@ Os dados da máquina persistem num ficheiro json.
 
 ## Requisitos para Utilização
 
+`python3 tp5.py <ficheiro>`: o ficheiro é opcional, se for passado deverá ter conteúdo. Caso o ficheiro passado como argumento não exista, será utilizado o ficheiro `initial.json` como base. Os dados serão sempre guardados no ficheiro `updated.json`.
+
 Comandos:
 
 - `listar`: Mostra todos os produtos disponíveis (código, nome, quantidade e preço)
