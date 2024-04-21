@@ -14,7 +14,7 @@ Cada trabalho prático tem uma pasta própria e contém um `README.md` com todos
 - **[TP3](/TP3/README.md) - Somador ON/OFF**
 - **[TP4](/TP4/README.md) - Analisador Léxico SQL**
 - **[TP5](/TP5/README.md) - Máquina de Vending**
-- **[TP6] - TODO**
+- **[TP6](/TP6/README.md) - Parser Top-Down Recursivo Descendente**
 
 ## Licença
 
